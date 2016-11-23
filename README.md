@@ -2,10 +2,10 @@
 
 ## Getting Started
 
-```vagrant up
+`vagrant up`
 
-cd /vagrant
+`cd /vagrant`
 
-./manage.py runserver 0.0.0.0:8000```
+`./manage.py runserver 0.0.0.0:8000`
 
 Visit 192.168.33.10:8000 in a browser
