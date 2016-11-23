@@ -1,0 +1,64 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+  - name: install packages
+    apt: name={{ item }} state=installed
+    with_items:
+      - nginx
+      - python-pip
+
+  - name: install rabbitmq
+    apt:
+      deb: https://www.rabbitmq.com/releases/rabbitmq-server/v3.6.6/rabbitmq-server_3.6.6-1_all.deb
+
+  - name: install django
+    pip: name=django
+
+  - name: enable services
+    service: name={{ item }} state=started enabled=yes
+    with_items:
+      - nginx
+      - rabbitmq-server
+
+  - name: install rabbitmq plugins
+    rabbitmq_plugin: names=rabbitmq_management,rabbitmq_web_stomp state=enabled
+    notify: restart rabbitmq
+
+  - name: configure rabbitmq
+    copy:
+      src: rabbitmq.config
+      dest: /etc/rabbitmq/rabbitmq.config
+      owner: rabbitmq
+      group: rabbitmq
+      mode: 0644
+    notify: restart rabbitmq
+
+  - name: add rabbitmq user bob
+    rabbitmq_user:
+      user: bob
+      password: changeme
+      permissions:
+      - vhost: /
+        configure_priv: .*
+        read_priv: .*
+        write_priv: .*
+      tags: administrator
+      state: present
+
+  - name: configure nginx
+    copy:
+      src: nginx.conf
+      dest: /etc/nginx/nginx.conf
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart nginx
+
+  handlers:
+  - name: restart rabbitmq
+    service: name=rabbitmq-server state=restarted
+
+  - name: restart nginx
+    service: name=nginx state=restarted
