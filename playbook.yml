@@ -13,8 +13,8 @@
     apt:
       deb: https://www.rabbitmq.com/releases/rabbitmq-server/v3.6.6/rabbitmq-server_3.6.6-1_all.deb
 
-  - name: install django
-    pip: name=django
+  - name: install requirements
+    pip: requirements=/vagrant/files/requirements.txt
 
   - name: enable services
     service: name={{ item }} state=started enabled=yes
@@ -46,6 +46,11 @@
         write_priv: .*
       tags: administrator
       state: present
+
+  - name: remove rabbimq default user
+    rabbitmq_user:
+      user: guest
+      state: absent
 
   - name: configure nginx
     copy:
