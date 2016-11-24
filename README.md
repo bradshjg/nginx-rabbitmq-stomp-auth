@@ -1,4 +1,4 @@
-# django-rabbitmq-stomp-auth
+# nginx-rabbitmq-stomp-auth
 
 ## Getting Started
 
